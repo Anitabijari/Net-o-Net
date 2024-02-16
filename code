@@ -1,0 +1,741 @@
+CREATE DATABASE NetONet 
+GO
+USE NetONet
+----------------------------------------------------------
+
+--Skapa tabellerna som jag har, totalt 1 stycken.
+--1-Customer( kund), vilken är vår huvudtabell .2-Payment. 3-Category. 4-Shipment. 5-cart 6-Adress. 7-Product. 8-Order 
+-- 9-Wishlist . 10 -User . 11-OrderProduct   12-Member . 13- Return  14.CustomerAddress  15.Store  16. 
+
+----Börja med kunden, som är huvudtabellen.
+
+CREATE TABLE dbo.Customer 
+(
+CustomerId INT  IDENTITY (1,1) PRIMARY KEY,
+CustomerFisrtName NVARCHAR (50) not null,
+CustomerLastName NVARCHAR (50) not null,
+Email NVARCHAR (50) not null,
+PhoneNumber NVARCHAR (50) not null,
+CustomerDescription NVARCHAR(30) not null,
+)
+CREATE TABLE dbo.CustomerAddress
+(
+CustomerAddressId INT  IDENTITY (10,1)PRIMARY KEY ,
+AddressId INT NOT NULL ,
+CustomerId INT   NOT NULL 
+)
+CREATE TABLE dbo.Addresses   -- det gick inte address föratt det är key word so skrive jag adresses
+(
+AddressId INT  IDENTITY (100,1) PRIMARY KEY,
+City NVARCHAR(50) NOT NULL ,
+StreetName  NVARCHAR (50)  NOT NULL,
+ZipCode  NVARCHAR (20)  NOT NULL
+)
+CREATE TABLE dbo.Shipment 
+(
+ShipmentId INT  IDENTITY (10,1) PRIMARY KEY,
+OrderId INT  NOT NULL ,
+SupplierId INT   NOT NULL ,
+ShipmentDate DATETIME NOT NULL,
+ShipmentStatus  NVARCHAR (30)  NOT NULL
+)
+CREATE TABLE dbo.Orders --Det gick inte order föratt det är key word so skrive jag orders
+(
+OrderId INT IDENTITY (1,1) PRIMARY KEY ,
+CustomerId INT   NOT NULL ,
+OrderDate DATE NOT NULL,
+OrderStatus  NVARCHAR (30)  NOT NULL
+)
+CREATE TABLE dbo.Supplier
+(
+SupplierId INT  IDENTITY(10,1) PRIMARY KEY ,
+SupplierName  NVARCHAR (50)  NOT NULL,
+SupplierPhoneNumber   NVARCHAR(20)  NOT NULL,
+SupplierEmail   NVARCHAR (100)  NOT NULL,
+SupplierStreetName  NVARCHAR (50)  NOT NULL,
+SupplierCity  NVARCHAR(50)  NOT NULL,
+SupplierZipCode  NVARCHAR (50)  NOT NULL
+)
+
+CREATE TABLE dbo.Store
+(
+StoreId INT  IDENTITY(100,1) PRIMARY KEY ,
+StoreName  NVARCHAR (50)  NOT NULL,
+StorePhoneNumber   NVARCHAR(20)  NOT NULL,
+StoreEmail   NVARCHAR (100)  NOT NULL,
+StoreStreetName  NVARCHAR (50)  NOT NULL,
+StoreCity  NVARCHAR (50)  NOT NULL,
+StoreZipCode  NVARCHAR (50)  NOT NULL,
+)
+CREATE TABLE dbo.Product 
+(
+ProductId INT  IDENTITY(1000,1) PRIMARY KEY ,
+SupplierId INT  NOT NULL,
+ProductName  NVARCHAR (50)  NOT NULL,
+StockQuantity INT   NOT NULL,
+ProductPrice MONEY NOT NULL
+)
+
+CREATE TABLE dbo.ProductCategory 
+(
+ProductCategoryId INT  IDENTITY(10,1) PRIMARY KEY ,
+CategoryId INT   NOT NULL,
+ProductId  INT   NOT NULL
+
+)
+CREATE TABLE dbo.Category 
+(
+CategoryId INT IDENTITY(100,1) PRIMARY KEY ,
+CategoryName NVARCHAR (50)  NOT NULL,
+)
+
+
+CREATE TABLE dbo.Payment
+(
+PaymentId INT IDENTITY (10,1) PRIMARY KEY ,
+PaymentMethod NVARCHAR(50)  NOT NULL,
+OrderId INT  NOT NULL ,
+PaymentAmount   MONEY  NOT NULL,
+PaymentDate DATE NOT NULL
+
+)
+CREATE TABLE dbo.Wishlist
+(
+WishlistId INT  IDENTITY(100,1) PRIMARY KEY ,
+CustomerId INT   NOT NULL ,
+ProductId INT   NOT NULL ,
+WishlistName  NVARCHAR (50)  NOT NULL,
+)
+
+CREATE TABLE dbo.Returnn
+(
+ReturnId INT  IDENTITY(10,1) PRIMARY KEY ,
+OrderId INT   NOT NULL ,
+ReturnMethod NVARCHAR(50) NOT NULL,
+AmountReturn  MONEY   NOT NULL,
+ReturnPaymentMethod NVARCHAR (50) NOT NULL
+)
+CREATE TABLE dbo.Cart
+(
+CartId INT IDENTITY(1,1) PRIMARY KEY,
+Quantity INT  Not Null
+)
+CREATE TABLE dbo.Members
+(
+MemberId INT  IDENTITY(1,1) PRIMARY KEY ,
+CustomerId INT  NOT NULL ,
+UserLoginId INT   NOT NULL,
+MembershipDate DATETIME NOT NULL
+)
+CREATE TABLE dbo.UserLogin
+(
+UserLoginId INT IDENTITY(1,1) PRIMARY KEY ,
+UserName   NVARCHAR (50)  NOT NULL,
+UserPassword NVARCHAR (15)  NOT NULL,
+)
+CREATE TABLE dbo.Employee
+(
+EmployeeId int IDENTITY(1,1) PRIMARY KEY ,
+StoreId  INT  ,
+OfficeId INT  ,
+UserLoginId INT   NOT NULL ,
+EmployeeFisrtName  NVARCHAR(50)  NOT NULL,
+EmployeeLastName  NVARCHAR(50)  NOT NULL,
+EmployeePhoneNumber  NVARCHAR(20)  NOT NULL,
+EmployeeEmail   NVARCHAR(100)  NOT NULL,
+JobPrecentage  DECIMAL(5,2)  NOT NULL,
+JobTitle  NVARCHAR(50)  NOT NULL
+)
+
+
+CREATE TABLE dbo.Office
+(
+OfficeId INT IDENTITY(1,1) PRIMARY KEY ,
+OfficeName  NVARCHAR(50)  NOT NULL,
+OfficePhoneNumber   NVARCHAR (20)  NOT NULL,
+OfficeEmail   NVARCHAR(100)  NOT NULL,
+OfficeStreetName  NVARCHAR(50)  NOT NULL,
+OfficeCity  NVARCHAR(50)  NOT NULL,
+OfficeZipCode  NVARCHAR(50)  NOT NULL
+)
+
+CREATE TABLE dbo.CartProduct 
+(
+ProductId INT   NOT NULL ,
+CartId INT   NOT NULL
+)
+
+CREATE TABLE dbo.StoreProduct 
+(
+ProductId INT   NOT NULL ,
+StoreId INT  NOT NULL
+)
+CREATE TABLE dbo.OrderProduct 
+(
+ProductId INT  NOT NULL ,
+OrderId INT NOT NULL
+)
+
+---------------------------------------------------------------------
+--number one between CustomerAddress and Address
+ALTER TABLE[dbo].[CustomerAddress] WITH CHECK ADD  CONSTRAINT FK_CustomerAddress_Addresses FOREIGN KEY([AddressId])
+REFERENCES [dbo].[Addresses]([AddressId]);
+GO
+ALTER TABLE [dbo].[CustomerAddress] CHECK CONSTRAINT FK_CustomerAddress_Addresses
+GO
+--RElationship between CustomerAddress and Customer
+
+ALTER TABLE[dbo].[CustomerAddress] WITH CHECK ADD  CONSTRAINT FK_CustomerAddress_Customer FOREIGN KEY([CustomerId])
+REFERENCES [dbo].[Customer]([CustomerId]);
+GO
+ALTER TABLE [dbo].[CustomerAddress] CHECK CONSTRAINT FK_CustomerAddress_Customer
+GO
+
+--RElationship between Orders and Customer
+
+ALTER TABLE[dbo].[Orders] WITH CHECK ADD  CONSTRAINT FK_Orders_Customer FOREIGN KEY([CustomerId])
+REFERENCES [dbo].[Customer]([CustomerId]);
+GO
+ALTER TABLE [dbo].[Orders] CHECK CONSTRAINT FK_Orders_Customer
+GO
+--RElationship between Orders and Payment
+
+ALTER TABLE [dbo].[Payment] WITH CHECK ADD  CONSTRAINT FK_Payment_Orders FOREIGN KEY([OrderId])
+REFERENCES [dbo].[Orders]([OrderId]);
+GO
+ALTER TABLE [dbo].[Payment] CHECK CONSTRAINT FK_Payment_Orders
+GO
+
+--RElationship between Orders and Shipment
+
+ALTER TABLE [dbo].[Shipment] WITH CHECK ADD  CONSTRAINT FK_Shipment_Orders FOREIGN KEY ([OrderId])
+REFERENCES [dbo].[Orders]([OrderId]);
+GO
+
+ALTER TABLE  [dbo].[Shipment] CHECK CONSTRAINT FK_Shipment_Orders
+GO
+
+--RElationship between [ProductCategory] and.[Category]
+
+ALTER TABLE [dbo].[ProductCategory] WITH CHECK ADD  CONSTRAINT FK_ProductCategory_Category FOREIGN KEY([CategoryId])
+REFERENCES [dbo].[Category]([CategoryId]);
+GO
+
+ALTER TABLE [dbo].[ProductCategory] CHECK CONSTRAINT FK_ProductCategory_Category
+GO
+--RElationship between [ProductCategory] and.[Product]
+
+ALTER TABLE [dbo].[ProductCategory] WITH CHECK ADD  CONSTRAINT FK_ProductCategory_Product FOREIGN KEY([ProductId])
+REFERENCES [dbo].[Product]([ProductId]);
+GO
+
+ALTER TABLE [dbo].[ProductCategory] CHECK CONSTRAINT FK_ProductCategory_Product
+GO
+
+--RElationship between [Wishlist] and.[Product]
+
+ALTER TABLE  [dbo].[Wishlist] WITH CHECK ADD  CONSTRAINT FK_Wishlist_Product FOREIGN KEY([ProductId])
+REFERENCES [dbo].[Product]([ProductId]);
+GO
+
+ALTER TABLE  [dbo].[Wishlist] CHECK CONSTRAINT FK_Wishlist_Product
+GO
+
+--RElationship between [Wishlist and.[Product]
+
+ALTER TABLE  [dbo].[Wishlist] WITH CHECK ADD  CONSTRAINT FK_Wishlist_Customer FOREIGN KEY([CustomerId])
+REFERENCES [dbo].[Customer]([CustomerId]);
+GO
+
+ALTER TABLE  [dbo].[Wishlist] CHECK CONSTRAINT FK_Wishlist_Customer
+GO
+
+
+
+--RElationship between [Returnn]and.[order]
+
+ALTER TABLE [dbo].[Returnn] WITH CHECK ADD  CONSTRAINT FK_Returnn_Orders FOREIGN KEY([OrderId])
+REFERENCES[dbo].[Orders]([OrderId]);
+GO
+
+ALTER TABLE [dbo].[Returnn] CHECK CONSTRAINT FK_Returnn_Orders
+GO
+--RElationship between [OrderProduct]and.[Product]
+
+ALTER TABLE[dbo].[OrderProduct] WITH CHECK ADD  CONSTRAINT FK_OrderProduct_Product FOREIGN KEY([ProductId])
+REFERENCES [dbo].[Product]([ProductId]);
+GO
+
+ALTER TABLE [dbo].[OrderProduct] CHECK CONSTRAINT FK_OrderProduct_Product
+GO
+--RElationship between [CartProduct] and.[Product]
+
+ALTER TABLE  [dbo].[CartProduct]WITH CHECK ADD  CONSTRAINT FK_CartProduct_Product FOREIGN KEY([ProductId])
+REFERENCES [dbo].[Product]([ProductId]);
+GO
+
+ALTER TABLE [dbo].[CartProduct]CHECK CONSTRAINT FK_CartProduct_Product
+GO
+--RElationship between [CartProduct] and.Cart]
+
+ALTER TABLE  [dbo].[CartProduct]WITH CHECK ADD  CONSTRAINT FK_CartProduct_Cart FOREIGN KEY([CartId])
+REFERENCES [dbo].[Cart]([CartId]);
+GO
+
+ALTER TABLE [dbo].[CartProduct]CHECK CONSTRAINT FK_CartProduct_Cart
+GO
+
+--RElationship between StoreProduct and.[Product]
+
+ALTER TABLE [dbo].[StoreProduct] WITH CHECK ADD  CONSTRAINT FK_StoreProduct_Product FOREIGN KEY([ProductId])
+REFERENCES [dbo].[Product] ([ProductId]);
+GO
+
+ALTER TABLE [dbo].[StoreProduct]CHECK CONSTRAINT FK_StoreProduct_Product
+GO
+
+--RElationship between StoreProduct and Product
+
+ALTER TABLE [dbo].[StoreProduct] WITH CHECK ADD CONSTRAINT FK_StoreProduct_Store FOREIGN KEY([StoreId])
+REFERENCES [dbo].[Store] ([StoreId]);
+GO
+
+ALTER TABLE [dbo].[StoreProduct]CHECK CONSTRAINT FK_StoreProduct_Store
+GO
+
+
+--RElationship between employee and store
+
+ALTER TABLE[dbo].[Employee] WITH CHECK ADD CONSTRAINT FK_Employee_Store FOREIGN KEY([StoreId])
+REFERENCES [dbo].[Store] ([StoreId]);
+GO
+
+ALTER TABLE [dbo].[Employee] CHECK CONSTRAINT FK_Employee_Store
+GO
+
+--RElationship between employee and office
+
+ALTER TABLE[dbo].[Employee] WITH CHECK ADD CONSTRAINT FK_Employee_Office FOREIGN KEY ([OfficeId])
+REFERENCES [dbo].[Office]([OfficeId]);
+GO
+
+ALTER TABLE [dbo].[Employee] CHECK CONSTRAINT FK_Employee_Office
+GO
+
+
+-- Add Foreign Key Constraint for CustomerId for one to one relationship between member and customer 
+ALTER TABLE dbo.Members  ADD CONSTRAINT FK_CustomerId  FOREIGN KEY (CustomerId) REFERENCES dbo.Customer(CustomerId);
+-- Add Unique Constraint for CustomerID
+ALTER TABLE dbo.Members ADD CONSTRAINT UQ_CustomerID UNIQUE(CustomerID);
+
+
+-- Add Foreign Key Constraint for UserLoginId for one to one relationship member
+ALTER TABLE dbo.Members ADD CONSTRAINT FK_UserLoginId  FOREIGN KEY (UserLoginId)  REFERENCES dbo.UserLogin (UserLoginId);
+
+-- Add Unique Constraint for UserLoginId
+ALTER TABLE dbo.Members ADD CONSTRAINT UQ1_UserLoginId UNIQUE(UserLoginId);
+
+
+
+
+
+-- Add Foreign Key Constraint for UserLoginId for one to one relationship Employee
+
+ALTER TABLE [dbo].[Employee] ADD CONSTRAINT FK_UserLoginId1 FOREIGN KEY (UserLoginId)  REFERENCES dbo.UserLogin(UserLoginId);
+
+-- Add Unique Constraint for UserLoginId
+ALTER TABLE[dbo].[Employee] 
+ADD CONSTRAINT UQ2_UserLoginId UNIQUE(UserLoginId);
+
+
+--RElationship between  OrderProduct and Orders 
+
+ALTER TABLE [dbo].[OrderProduct] WITH CHECK ADD  CONSTRAINT FK_OrderProduct_Orders FOREIGN KEY ([OrderId])
+REFERENCES [dbo].[Orders] ([OrderId]);
+GO
+
+ALTER TABLE [dbo].[OrderProduct] CHECK CONSTRAINT FK_OrderProduct_Orders
+GO
+--RElationship between [Supplier] and [Product]
+
+ALTER TABLE [dbo].[Product] WITH CHECK ADD CONSTRAINT FK_Product_Supplier FOREIGN KEY ([SupplierId])
+REFERENCES [dbo].[Supplier] ([SupplierId]);
+GO
+
+ALTER TABLE [dbo].[Product]CHECK CONSTRAINT FK_Product_Supplier
+GO
+--RElationship between [Supplier] and [Shipment]
+
+ALTER TABLE [dbo].[Shipment] WITH CHECK ADD CONSTRAINT FK_Shipment_Supplier FOREIGN KEY ([SupplierId])
+REFERENCES[dbo].[Supplier]  ([SupplierId]);
+GO
+
+ALTER TABLE  [dbo].[Shipment] CHECK CONSTRAINT  FK_Shipment_Supplier
+GO
+
+--------------------------------------------------------------------------
+
+  -- Insert data into UserLogin table for Employees and Customers
+
+INSERT INTO dbo.UserLogin (UserName, UserPassword)
+VALUES 
+  -- Employees
+  ('john_doe_employee', 'john_123_doe'),
+  ('anna_svensson_employee', 'anna_svensson'),
+  ('erik_andersson_employee', 'erik1236anders'),
+  ('lina_persson_employee', 'lina123'),
+  ('sofia_andersson_employee', 'psofiaander321'),
+  ('michael_brown_employee', 'securepassword'),
+  ('jennifer_smith_employee', 'mypasjenifer123'),
+  ('david_garcia_employee', 'david123'),
+  ('ahmed_ali_employee', 'ahmedali456'),
+  ('sophie_dupont_employee', 'secure123'),
+  ('hans_mueller_employee', 'mysecured'),
+  ('sabine_schmidt_employee', 'sabine123'),
+  ('luca_rossi_employee', 'luca456'),
+  ('maria_gonzalez_employee', 'maria789'),
+  ('ivan_ivanov_employee', 'ivanov123'),
+
+  -- Customers
+  ('erik_andersson_customer', 'erik123'),
+  ('anna_johansson_customer', 'anna123'),
+  ('anders_larsson_customer', 'anders123'),
+  ('maria_nilsson_customer', 'maria123'),
+  ('oskar_sjoberg_customer', 'oskar123'),
+  ('lina_persson_customer', 'lina123'),
+  ('gustav_karlsson_customer', 'gustav123'),
+  ('sofia_andersson_customer', 'sofia123'),
+  ('karl_jonsson_customer', 'karl123'),
+  ('emma_jansson_customer', 'emma123');
+
+-- Insert  data into Customer table
+INSERT INTO dbo.Customer (CustomerFisrtName, CustomerLastName, Email, PhoneNumber, CustomerDescription)
+VALUES 
+  ('Erik', 'Andersson', 'erik.andersson@mail.se', '0707470113',  'Private'),
+  ('Anna', 'Johansson', 'anna.johansson@mail.se', '0736478112',  'Private'),
+  ('Anders', 'Larsson', 'anders.larsson@mail.se', '0765586111',  'Private'),
+  ('Maria', 'Nilsson', 'maria.nilsson@mail.se', '0701234567',  'Private'),
+  ('Oskar', 'Sjöberg', 'oskar.sjoberg@mail.se', '0739876543',  'Private'),
+  ('Lina', 'Persson', 'lina.persson@mail.se', '0763456789',  'Private'),
+  ('Gustav', 'Karlsson', 'gustav.karlsson@mail.se', '0725556677',  'Private'),
+  ('Sofia', 'Andersson', 'sofia.andersson@mail.se', '0734445556',  'Private'),
+  ('Karl', 'Jonsson', 'karl.jonsson@mail.se', '0756667778',  'Private'),
+  ('Emma', 'Jansson', 'emma.jansson@mail.se', '0767778889',  'Private');
+
+  -- Insert  data into Addresses table
+INSERT INTO dbo.Addresses (City, StreetName, ZipCode)
+VALUES 
+  ('Stockholm', 'Main Street', '16443'),
+  ('Gothenburg', 'Oak Avenue', '16444'),
+  ('Malmö', 'Maple Drive', '16445'),
+  ('Uppsala', 'Pine Road', '16446'),
+  ('Linköping', 'Cedar Lane', '16447'),
+  ('Västerås', 'Birch Boulevard', '16448'),
+  ('Örebro', 'Elm Way', '16449'),
+  ('Helsingborg', 'Spruce Court', '16450'),
+  ('Jönköping', 'Willow Circle', '16451'),
+  ('Norrköping', 'Redwood Street', '16452');
+
+-- Insert data into CustomerAddress table
+
+INSERT INTO dbo.CustomerAddress (AddressId, CustomerId)
+VALUES 
+  (100, 1), 
+  (101, 2),
+  (102, 3),
+  (103, 4),
+  (104, 5),
+  (105, 6),
+  (106, 7),
+  (107, 8),
+  (108, 9),
+  (109, 10);
+
+    -- Insert data  into Orders table 
+INSERT INTO dbo.Orders (CustomerId,OrderDate,OrderStatus)
+VALUES 
+  (1,'2023-10-05','Shipped'),
+  (2,'2023-10-06','Shipped'),
+  (3,'2023-10-07','Processing'),
+  (4,'2023-10-08','Delivered'),
+  (5,'2023-10-09','Shipped'),
+  (6,'2023-10-10','Processing'),
+  (7,'2023-10-11','Shipped'),
+  (8,'2023-10-12','Delivered'),
+  (9,'2023-10-13','Processing'),
+  (10,'2023-10-14','Shipped');
+
+    -- Insert data into Supplier table
+INSERT INTO dbo.Supplier (SupplierName, SupplierPhoneNumber, SupplierEmail, SupplierStreetName, SupplierCity, SupplierZipCode)
+VALUES 
+  ('TechSupply AB','0701234567','info@techsupply.se','Tech Street 1','Stockholm','16443'),
+  ('ElectroTech','0709876543','info@electrotech.se','Electro Street 2','Gothenburg','23456'),
+  ('Gadget World','0705545555','info@gadgetworld.se','Gadget Street 3','Malmo','34567'),
+  ('Smart Devices','0706665666','info@smartdevices.se','Smart Street 4','Uppsala','45678'),
+  ('Tech Innovators','0707657777','info@techinnovators.se','Innovator Street 5','Linkoping','56789'),
+  ('Digital Warehouse','0708881288','info@digitalwarehouse.se','Digital Street 6','Helsingborg','67890'),
+  ('CyberTech', '0709548122','info@cybertech.se','Cyber Street 7','Vasteras','78901'),
+  ('E-Tech Solutions','071111471','info@etechsolutions.se', 'E-Tech Street 8','Orebro', '89012'),
+  ('Future Electronics','0710148722','info@futureelectronics.se','Future Street 9','Gavle','90123'),
+  ('Ultimate Gadgets','07113682452','info@ultimategadgets.se','Ultimate Street 10','Norrkoping','01234');
+
+
+  -- Insert  data into Shipment table
+
+INSERT INTO dbo.Shipment (OrderId,SupplierId,ShipmentDate, ShipmentStatus)
+VALUES 
+  (1,10,'2022-10-05 08:00:00', 'In Transit'),
+  (2,11,'2022-11-06 09:00:00', 'Delivered'),
+  (3,12,'2022-12-07 10:00:00', 'In Transit'),
+  (4,13,'2023-01-08 11:00:00', 'Delivered'),
+  (5,14,'2023-02-09 12:00:00', 'In Transit'),
+  (6,15,'2023-03-10 13:00:00', 'Delivered'),
+  (7,16,'2023-04-11 14:00:00', 'In Transit'),
+  (8,17,'2023-05-12 15:00:00', 'Delivered'),
+  (9,18,'2023-06-13 16:00:00', 'In Transit'),
+  (10,19,'2023-07-14 17:00:00', 'Delivered');
+
+  INSERT INTO dbo.Payment (PaymentMethod,OrderId, PaymentAmount,PaymentDate)
+VALUES 
+  ('Credit Card',1, 1200.00,'2022-10-05'),
+  ('Klarna',2, 800.00,'2023-07-14'),
+  ('Credit Card',3, 500.00,'2023-06-13'),
+  ('Klarna', 4,700.00,'2023-03-10'),
+  ('Credit Card',5, 300.00,'2022-12-07'),
+  ('Klarna',6, 400.00,'2022-11-06'),
+  ('Credit Card',7, 100.00,'2023-01-08'),
+  ('Klarna',8, 200.00,'2023-02-09'),
+  ('Credit Card',9, 30.00,'2022-11-06'),
+  ('Klarna',10, 15.00,'2023-02-09');
+
+
+
+  -- Insert data into Store table
+INSERT INTO dbo.Store (StoreName, StorePhoneNumber, StoreEmail, StoreStreetName, StoreCity, StoreZipCode)
+VALUES 
+  ('NetONet Central Store', '0701234567', 'central@store.netonet.se', 'Main Street 1', 'Stockholm', '16443'),
+  ('NetONet North Store', '0739876543', 'north@store.netonet.se', 'North Street 2', 'Uppsala', '75105'),
+  ('NetONet South Store', '0763456789', 'south@store.netonet.se', 'South Street 3', 'Malmö', '21122'),
+  ('NetONet West Store', '0725556677', 'west@store.netonet.se', 'West Street 4', 'Gothenburg', '41250'),
+  ('NetONet East Store', '0734445556', 'east@store.netonet.se', 'East Street 5', 'Norrköping', '60123'),
+  ('NetONet Central West Store', '0756667778', 'centralwest@store.netonet.se', 'Central West Street 6', 'Örebro', '70234'),
+  ('NetONet Central East Store', '0767778889', 'centraleast@store.netonet.se', 'Central East Street 7', 'Linköping', '58100'),
+  ('NetONet South West Store', '0707470113', 'southwest@store.netonet.se', 'South West Street 8', 'Växjö', '35215'),
+  ('NetONet South East Store', '0736478112', 'southeast@store.netonet.se', 'South East Street 9', 'Kalmar', '39122'),
+  ('NetONet North West Store', '0765586111', 'northwest@store.netonet.se', 'North West Street 10', 'Umeå', '90100');
+
+ 
+
+    -- Insert data into Product table
+INSERT INTO dbo.Product (SupplierId, ProductName, StockQuantity, ProductPrice)
+VALUES 
+  (10, 'Laptop', 100, 1200.00),
+  (11, 'Desktop Computer', 80, 800.00),
+  (12, 'Tablet', 150, 500.00),
+  (13, 'Smartphone', 200, 700.00),
+  (14, 'Printer', 50, 300.00),
+  (15, 'Scanner', 60, 400.00),
+  (16, 'Headphones', 120, 100.00),
+  (17, 'Monitor', 90, 200.00),
+  (18, 'Keyboard', 180, 30.00),
+  (19, 'Mouse', 200, 15.00);
+
+  -- Insert data into StoreProduct table
+INSERT INTO dbo.StoreProduct (ProductId, StoreId)
+VALUES 
+  (1000, 100),
+  (1001, 101),
+  (1002, 102),
+  (1003, 103),
+  (1004, 104),
+  (1005, 105),
+  (1006, 106),
+  (1007, 107),
+  (1008, 108),
+  (1009, 109);
+
+
+
+
+
+  -- Insert data into Category table
+INSERT INTO dbo.Category (CategoryName)
+VALUES 
+  ('Computer & Tablet'),
+  ('Computer Components'),
+  ('Gaming'),
+  ('Home & Leisure'),
+  ('TV'),
+  ('Audio'),
+  ('Mobile & Smartwatch'),
+  ('Appliances');
+  
+
+  -- Insert data into ProductCategory table
+INSERT INTO dbo.ProductCategory (CategoryId, ProductId)
+VALUES 
+  (100, 1000),
+  (101, 1001),
+  (100, 1002),
+  (101, 1003),
+  (100, 1004),
+  (101, 1005),
+  (102, 1006),
+  (103, 1007),
+  (104, 1008),
+  (105, 1009);
+
+
+ 
+
+
+  -- Insert data into Office table 
+INSERT INTO dbo.Office (OfficeName, OfficePhoneNumber, OfficeEmail, OfficeStreetName, OfficeCity, OfficeZipCode)
+VALUES 
+  ('NetONet Head Office', '0712345678', 'info@netonet.se', 'Main Street 1', 'Stockholm', '16443'),
+  ('NetONet Branch Office - Gothenburg', '0723456789', 'info-gothenburg@netonet.se', 'Branch Street 2', 'Gothenburg', '23456'),
+  ('NetONet Branch Office - Malmo', '0734567890', 'info-malmo@netonet.se', 'Branch Street 3', 'Malmo', '34567'),
+  ('NetONet Branch Office - Uppsala', '0745678901', 'info-uppsala@netonet.se', 'Branch Street 4', 'Uppsala', '45678'),
+  ('NetONet Branch Office - Linkoping', '0756789012', 'info-linkoping@netonet.se', 'Branch Street 5', 'Linkoping', '56789');
+
+
+  -- Insert data into Employee table 
+INSERT INTO dbo.Employee (StoreId,OfficeId,UserLoginId,EmployeeFisrtName,EmployeeLastName,EmployeePhoneNumber,EmployeeEmail,JobPrecentage,JobTitle)
+VALUES 
+  (100, NULL, 5, 'John', 'Doe', '0701234567', 'john.doe@netonet.se', 75,'Manager'),
+  (100, NULL, 6, 'Anna', 'Svensson', '0702345678', 'anna.svensson@netonet.se', 75,'Sales Associate'),
+  (100, NULL, 7, 'Erik', 'Andersson', '0703456789', 'erik.andersson@netonet.se', 75,'Accountant'),
+  (100, NULL, 8, 'Lina', 'Persson', '0704567890', 'lina.persson@netonet.se', 100,'Accountant'),
+  (100, NULL, 9, 'Sofia', 'Andersson', '0705678901', 'sofia.andersson@netonet.se',100, 'Manager'),
+  (NULL, 1, 10, 'Michael', 'Brown', '0706789012', 'michael.brown@netonet.se',100,'Cashier'),
+  (NULL,1, 11, 'Jennifer', 'Smith', '0707890123', 'jennifer.smith@netonet.se',75,'Storekeeper'),
+  (NULL, 1, 12, 'David', 'Garcia', '0708901234', 'david.garcia@netonet.se',100,'Sales Associate'),
+  (NULL, 1, 13, 'Ahmed', 'Ali', '0709012345', 'ahmed.ali@netonet.se',75,'Sales Associate'),
+  (NULL, 2, 14, 'Sophie', 'Dupont', '0700123456', 'sophie.dupont@netonet.se',100,'Cashier'),
+  (NULL, 2, 15, 'Hans', 'Mueller', '0701234567', 'hans.mueller@netonet.se',100,'Cashier'),
+  (NULL, 3, 16, 'Sabine', 'Schmidt', '0702345678', 'sabine.schmidt@netonet.se', 100, 'Sales Associate'),
+  (NULL,4, 17,'Luca', 'Rossi', '0703456789', 'luca.rossi@netonet.se',75,'Sales Associate'),
+  (NULL, 4, 18,'Maria', 'Gonzalez', '0704567890','maria.gonzalez@netonet.se',50,'Cashier'),
+  (NULL, 5, 19,'Ivan', 'Ivanov','0705678901','ivan.ivanov@netonet.se',50,'Storekeeper');
+
+  -- Insert data into UserLogin table for Employees
+INSERT INTO dbo.UserLogin (UserName, UserPassword)
+VALUES 
+  -- Employees
+  ('john_doe_employee', 'john_123_doe'),
+  ('anna_svensson_employee', 'anna_svensson'),
+  ('erik_andersson_employee', 'erik1236anders'),
+  ('lina_persson_employee', 'lina123'),
+  ('sofia_andersson_employee', 'psofiaander321'),
+  ('michael_brown_employee', 'securepassword'),
+  ('jennifer_smith_employee', 'mypasjenifer123'),
+  ('david_garcia_employee', 'david123'),
+  ('ahmed_ali_employee', 'ahmedali456'),
+  ('sophie_dupont_employee', 'secure123'),
+  ('hans_mueller_employee', 'mysecured'),
+  ('sabine_schmidt_employee', 'sabine123'),
+  ('luca_rossi_employee', 'luca456'),
+  ('maria_gonzalez_employee', 'maria789'),
+  ('ivan_ivanov_employee', 'ivanov123'),
+
+  -- Customers
+  ('erik_andersson_customer', 'erik123'),
+  ('anna_johansson_customer', 'anna123'),
+  ('anders_larsson_customer', 'anders123'),
+  ('maria_nilsson_customer', 'maria123'),
+  ('oskar_sjoberg_customer', 'oskar123'),
+  ('lina_persson_customer', 'lina123'),
+  ('gustav_karlsson_customer', 'gustav123'),
+  ('sofia_andersson_customer', 'sofia123'),
+  ('karl_jonsson_customer', 'karl123'),
+  ('emma_jansson_customer', 'emma123');
+
+
+  -- Insert data into Members table
+INSERT INTO dbo.Members (CustomerId, UserLoginId, MembershipDate)
+VALUES 
+  (1, 20, '2023-10-04 14:30:00'), -- Erik Andersson
+  (2, 21, '2023-10-04 15:45:00'), -- Anna Johansson
+  (3, 22, '2023-10-04 16:30:00'), -- Anders Larsson
+  (4, 23, '2023-10-04 17:15:00'), -- Maria Nilsson
+  (5, 24, '2023-10-04 14:45:00'), -- Oskar Sjöberg
+  (6, 25, '2023-10-04 15:30:00'), -- Lina Persson
+  (7, 26, '2023-10-04 16:00:00'), -- Gustav Karlsson
+  (8, 27, '2023-10-04 17:00:00'), -- Sofia Andersson
+  (9, 28, '2023-10-04 14:15:00'), -- Karl Jonsson
+  (10, 29, '2023-10-04 15:15:00'); -- Emma Jansson
+
+
+  -- Insert data into Returnn table
+INSERT INTO dbo.Returnn (OrderId, ReturnMethod, AmountReturn, ReturnPaymentMethod)
+VALUES 
+  (1, 'Refund', 50.00, 'Credit Card'),
+  (2, 'Exchange', 0.00, 'Klarna'),
+  (3, 'Refund', 30.00, 'Credit Card'),
+  (4, 'Exchange', 0.00, 'Klarna'),
+  (5, 'Refund', 70.00, 'Credit Card'),
+  (6, 'Exchange', 0.00, 'Klarna'),
+  (7, 'Refund', 60.00, 'Credit Card'),
+  (8, 'Exchange', 0.00, 'Klarna'),
+  (9, 'Refund', 40.00, 'Credit Card'),
+  (10, 'Exchange', 0.00, 'Klarna');
+
+  -- Insert data into Wishlist table
+
+-- Insert data into Wishlist table
+INSERT INTO dbo.Wishlist (CustomerId, ProductId, WishlistName)
+VALUES 
+  (1, 1000, 'Erik\s Wishlist 1'),
+  (2, 1001, 'Anna\s Wishlist 1'),
+  (3, 1002, 'Anders\s Wishlist 1'),
+  (4, 1003, 'Maria\s Wishlist 1'),
+  (5, 1004, 'Oskar\s Wishlist 1'),
+  (6, 1005, 'Lina\s Wishlist 1'),
+  (7, 1006, 'Gustav\s Wishlist 1'),
+  (8, 1007, 'Sofia\s Wishlist 1'),
+  (9, 1008, 'Karl\s Wishlist 1'),
+  (10, 1009 ,'Emma\s Wishlist 1');
+
+
+  -- Insert data into Cart table
+INSERT INTO dbo.Cart (Quantity)
+VALUES 
+  (5),
+  (3),
+  (2),
+  (1),
+  (4),
+  (6),
+  (3),
+  (2),
+  (1),
+  (4);
+
+  -- Insert data into CartProduct table
+INSERT INTO dbo.CartProduct (ProductId, CartId)
+VALUES 
+  (1000, 1),
+  (1001, 2),
+  (1002, 3),
+  (1003, 4),
+  (1004, 5),
+  (1005, 6),
+  (1006, 7),
+  (1007, 8),
+  (1008, 9),
+  (1009, 10);
+
+  -- Insert data into OrderProduct table
+
+INSERT INTO dbo.OrderProduct (ProductId,OrderId )
+VALUES 
+  (1000, 1),
+  (1001, 2),
+  (1002, 3),
+  (1003, 4),
+  (1004, 5),
+  (1005, 6),
+  (1006, 7),
+  (1007, 8),
+  (1008, 9),
+  (1009, 10);
